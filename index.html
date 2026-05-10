@@ -5,89 +5,87 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>ThwinAI - TTOE System</title>
     <style>
-        body { background-color: #0d1117; color: #58a6ff; font-family: 'Segoe UI', Tahoma, sans-serif; display: flex; flex-direction: column; align-items: center; padding: 20px; margin: 0; min-height: 100vh; }
-        .header { text-align: center; margin-bottom: 20px; }
-        #chat-box { width: 100%; max-width: 600px; height: 450px; border: 1px solid #30363d; overflow-y: auto; padding: 15px; margin-bottom: 10px; border-radius: 12px; background: #161b22; box-shadow: 0 4px 15px rgba(0,0,0,0.5); display: flex; flex-direction: column; }
-        .msg { margin: 10px 0; padding: 12px; border-radius: 10px; line-height: 1.5; max-width: 85%; word-wrap: break-word; }
-        .user { background: #1f6feb; color: white; align-self: flex-end; text-align: right; border-bottom-right-radius: 2px; }
-        .ai { background: #21262d; color: #c9d1d9; border-left: 4px solid #238636; align-self: flex-start; border-bottom-left-radius: 2px; }
-        .input-area { display: flex; width: 100%; max-width: 600px; gap: 8px; }
-        input { flex: 1; padding: 12px; border-radius: 8px; border: 1px solid #30363d; background: #0d1117; color: white; outline: none; }
-        button { padding: 10px 25px; border: none; background: #238636; color: white; border-radius: 8px; cursor: pointer; font-weight: bold; transition: 0.3s; }
+        body { margin: 0; background: #0d1117; color: white; font-family: 'Segoe UI', Tahoma, sans-serif; display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100vh; }
+        .chat { width: 95%; max-width: 700px; height: 85vh; background: #161b22; border-radius: 15px; display: flex; flex-direction: column; overflow: hidden; box-shadow: 0 0 25px rgba(0,0,0,.5); border: 1px solid #30363d; }
+        .header { background: #238636; padding: 15px; text-align: center; font-size: 22px; font-weight: bold; letter-spacing: 2px; }
+        .messages { flex: 1; overflow-y: auto; padding: 15px; display: flex; flex-direction: column; }
+        .msg { margin: 10px 0; padding: 12px; border-radius: 12px; max-width: 80%; line-height: 1.5; word-wrap: break-word; }
+        .user { background: #1f6feb; align-self: flex-end; border-bottom-right-radius: 2px; }
+        .ai { background: #30363d; align-self: flex-start; border-bottom-left-radius: 2px; border-left: 4px solid #238636; }
+        .inputBox { display: flex; padding: 15px; background: #0d1117; border-top: 1px solid #30363d; }
+        input { flex: 1; padding: 12px; border: none; border-radius: 10px; background: #21262d; color: white; outline: none; }
+        button { margin-left: 10px; padding: 12px 25px; border: none; border-radius: 10px; background: #238636; color: white; cursor: pointer; font-weight: bold; transition: 0.3s; }
         button:hover { background: #2ea043; }
-        .error { color: #f85149; border-left-color: #f85149; }
     </style>
 </head>
 <body>
 
-    <div class="header">
-        <h2 style="color: #f0f6fc; margin: 0; letter-spacing: 2px;">THWIN AI</h2>
-        <div style="font-size: 0.85em; color: #8b949e; font-weight: bold;">TTOE ADAPTIVE INTELLIGENCE</div>
-    </div>
-
-    <div id="chat-box"></div>
-
-    <div class="input-area">
-        <input type="text" id="userInput" placeholder="TTOE နည်းစနစ်ဖြင့် မေးမြန်းရန်...">
+<div class="chat">
+    <div class="header">THWIN AI</div>
+    <div class="messages" id="messages"></div>
+    <div class="inputBox">
+        <input id="input" placeholder="TTOE နည်းစနစ်ဖြင့် မေးမြန်းရန်..." autocomplete="off">
         <button onclick="send()">Send</button>
     </div>
+</div>
 
-    <script>
-        // API Key ကို စဖွင့်ချင်း Prompt ဖြင့် တောင်းယူခြင်း (GitHub က Key ပိတ်မပစ်စေရန်)
-        let API_KEY = prompt("ThwinAI ကို စတင်ရန် Gemini API Key ကို ထည့်ပါ:");
-        
-        if (!API_KEY) {
-            alert("API Key မရှိလျှင် အသုံးပြု၍ မရနိုင်ပါ။ Page ကို Refresh ပြန်လုပ်ပြီး Key ထည့်ပါ။");
-        }
+<script>
+    // GitHub က Key ကို ဖတ်ပြီး မပိတ်အောင် prompt ကို သုံးထားပါတယ်
+    let API_KEY = prompt("ThwinAI ကို စတင်ရန် Gemini API Key ကို ထည့်ပါ:");
 
-        async function send() {
-            const input = document.getElementById('userInput');
-            const chatBox = document.getElementById('chat-box');
-            const message = input.value.trim();
+    if (!API_KEY) {
+        alert("API Key လိုအပ်ပါသည်။ Page ကို Refresh လုပ်ပြီး Key ပြန်ထည့်ပါ။");
+    }
 
-            if (!message || !API_KEY) return;
+    async function send() {
+        const input = document.getElementById("input");
+        const messages = document.getElementById("messages");
+        const text = input.value.trim();
 
-            // User Message ကို Chat Box တွင် ပြခြင်း
-            chatBox.innerHTML += `<div class="msg user"><b>You:</b> ${message}</div>`;
-            input.value = '';
-            chatBox.scrollTop = chatBox.scrollHeight;
+        if (!text || !API_KEY) return;
 
-            // Stable Version v1 Endpoint ကို အသုံးပြုထားပါသည်
-            const API_URL = `https://generativelanguage.googleapis.com/v1/models/gemini-1.5-flash:generateContent?key=${API_KEY}`;
+        // User Message ပြသခြင်း
+        messages.innerHTML += `<div class="msg user">${text}</div>`;
+        input.value = "";
+        messages.scrollTop = messages.scrollHeight;
 
-            try {
-                const response = await fetch(API_URL, {
-                    method: "POST",
-                    headers: { "Content-Type": "application/json" },
-                    body: JSON.stringify({
-                        contents: [{
-                            parts: [{
-                                text: `System Instruction: You are ThwinAI, based on TTOE (Thwin Theory of Everything) logic. Use Energy, Evolution, Pattern, Interaction, Information, and Consciousness to answer. User Query: ${message}`
-                            }]
+        // Gemini API v1 Stable Version
+        const API_URL = `https://generativelanguage.googleapis.com/v1/models/gemini-1.5-flash:generateContent?key=${API_KEY}`;
+
+        try {
+            const response = await fetch(API_URL, {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({
+                    contents: [{
+                        parts: [{
+                            text: `System Instruction: You are ThwinAI, an advanced Adaptive Intelligence based on TTOE logic. Respond to: ${text}`
                         }]
-                    })
-                });
+                    }]
+                })
+            });
 
-                const data = await response.json();
+            const data = await response.json();
 
-                if (data.error) {
-                    throw new Error(data.error.message);
-                }
-
-                // AI ရဲ့ အဖြေကို ထုတ်ပြခြင်း
-                const aiResponse = data.candidates[0].content.parts[0].text;
-                chatBox.innerHTML += `<div class="msg ai"><b>ThwinAI:</b> ${aiResponse}</div>`;
-
-            } catch (error) {
-                chatBox.innerHTML += `<div class="msg ai error"><b>Error:</b> ${error.message} <br> (Key မှားယွင်းနေခြင်း သို့မဟုတ် Internet မရှိခြင်း ဖြစ်နိုင်ပါသည်။)</div>`;
+            if (data.error) {
+                throw new Error(data.error.message);
             }
-            chatBox.scrollTop = chatBox.scrollHeight;
+
+            const aiReply = data.candidates[0].content.parts[0].text;
+            messages.innerHTML += `<div class="msg ai">${aiReply}</div>`;
+
+        } catch (err) {
+            messages.innerHTML += `<div class="msg ai" style="color: #f85149;">Error: ${err.message}</div>`;
         }
 
-        // Enter key နှိပ်ပါက Send ခလုတ်အလုပ်လုပ်ရန်
-        document.getElementById('userInput').addEventListener('keypress', (e) => {
-            if (e.key === 'Enter') send();
-        });
-    </script>
+        messages.scrollTop = messages.scrollHeight;
+    }
+
+    // Enter key support
+    document.getElementById('input').addEventListener('keypress', (e) => {
+        if (e.key === 'Enter') send();
+    });
+</script>
+
 </body>
 </html>
