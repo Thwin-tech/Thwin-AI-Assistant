@@ -14,8 +14,7 @@
         .ai { background: #30363d; align-self: flex-start; border-bottom-left-radius: 2px; border-left: 4px solid #238636; }
         .inputBox { display: flex; padding: 15px; background: #0d1117; border-top: 1px solid #30363d; }
         input { flex: 1; padding: 12px; border: none; border-radius: 10px; background: #21262d; color: white; outline: none; }
-        button { margin-left: 10px; padding: 12px 25px; border: none; border-radius: 10px; background: #238636; color: white; cursor: pointer; font-weight: bold; transition: 0.3s; }
-        button:hover { background: #2ea043; }
+        button { margin-left: 10px; padding: 12px 25px; border: none; border-radius: 10px; background: #238636; color: white; cursor: pointer; font-weight: bold; }
     </style>
 </head>
 <body>
@@ -30,7 +29,7 @@
 </div>
 
 <script>
-    // GitHub က Key ကို ဖတ်ပြီး မပိတ်အောင် prompt ကို သုံးထားပါတယ်
+    // API Key ကို စဖွင့်ချင်း Prompt ဖြင့် တောင်းယူခြင်း
     let API_KEY = prompt("ThwinAI ကို စတင်ရန် Gemini API Key ကို ထည့်ပါ:");
 
     if (!API_KEY) {
@@ -49,8 +48,8 @@
         input.value = "";
         messages.scrollTop = messages.scrollHeight;
 
-        // Gemini API v1 Stable Version
-        const API_URL = `https://generativelanguage.googleapis.com/v1/models/gemini-1.5-flash:generateContent?key=${API_KEY}`;
+        // နောက်ဆုံးပြခဲ့သည့် Error အရ v1beta သို့ ပြန်လည်ပြောင်းလဲထားသည်
+        const API_URL = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${API_KEY}`;
 
         try {
             const response = await fetch(API_URL, {
@@ -59,7 +58,7 @@
                 body: JSON.stringify({
                     contents: [{
                         parts: [{
-                            text: `System Instruction: You are ThwinAI, an advanced Adaptive Intelligence based on TTOE logic. Respond to: ${text}`
+                            text: `System Instruction: You are ThwinAI, an advanced AI based on TTOE (Thwin Theory of Everything). Use TTOE logic to respond: ${text}`
                         }]
                     }]
                 })
