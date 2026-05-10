@@ -5,36 +5,38 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>ThwinAI - TTOE System</title>
     <style>
-        body { background-color: #0d1117; color: #58a6ff; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; display: flex; flex-direction: column; align-items: center; padding: 20px; }
+        body { background-color: #0d1117; color: #58a6ff; font-family: 'Segoe UI', Tahoma, sans-serif; display: flex; flex-direction: column; align-items: center; padding: 20px; }
         #chat-box { width: 100%; max-width: 600px; height: 450px; border: 1px solid #30363d; overflow-y: auto; padding: 15px; margin-bottom: 10px; border-radius: 12px; background: #161b22; box-shadow: 0 4px 15px rgba(0,0,0,0.5); }
-        .msg { margin: 12px 0; padding: 10px; border-radius: 8px; line-height: 1.5; }
-        .user { background: #1f6feb; color: white; align-self: flex-end; text-align: right; margin-left: 20%; }
-        .ai { background: #21262d; color: #c9d1d9; border-left: 4px solid #238636; margin-right: 20%; }
-        .input-area { display: flex; width: 100%; max-width: 600px; gap: 5px; }
+        .msg { margin: 12px 0; padding: 10px; border-radius: 8px; line-height: 1.5; word-wrap: break-word; }
+        .user { background: #1f6feb; color: white; align-self: flex-end; text-align: right; margin-left: 15%; }
+        .ai { background: #21262d; color: #c9d1d9; border-left: 4px solid #238636; margin-right: 15%; }
+        .input-area { display: flex; width: 100%; max-width: 600px; gap: 8px; }
         input { flex: 1; padding: 12px; border-radius: 8px; border: 1px solid #30363d; background: #0d1117; color: white; outline: none; }
-        input:focus { border-color: #58a6ff; }
         button { padding: 10px 25px; border: none; background: #238636; color: white; border-radius: 8px; cursor: pointer; font-weight: bold; }
         button:hover { background: #2ea043; }
-        .status { font-size: 0.8em; margin-bottom: 10px; color: #8b949e; }
+        .header { text-align: center; margin-bottom: 20px; }
     </style>
 </head>
 <body>
 
-    <h2 style="color: #f0f6fc; letter-spacing: 2px;">THWIN AI</h2>
-    <div class="status">TTOE Based Adaptive Intelligence</div>
+    <div class="header">
+        <h2 style="color: #f0f6fc; margin-bottom: 5px;">THWIN AI</h2>
+        <div style="font-size: 0.8em; color: #8b949e;">TTOE BASED ADAPTIVE INTELLIGENCE</div>
+    </div>
+
     <div id="chat-box"></div>
 
     <div class="input-area">
-        <input type="text" id="userInput" placeholder="Ask ThwinAI (TTOE Logic)...">
+        <input type="text" id="userInput" placeholder="TTOE နည်းစနစ်ဖြင့် မေးမြန်းရန်...">
         <button onclick="send()">Send</button>
     </div>
 
     <script>
-        // စာမျက်နှာစဖွင့်တာနဲ့ API Key တောင်းပါမယ်
-        let API_KEY = prompt("ThwinAI ကို စတင်ရန် Gemini API Key ကို ရိုက်ထည့်ပါ:");
+        // API Key ကို Prompt ဖြင့် တောင်းယူခြင်း (GitHub ပိတ်ခြင်းမှ ကာကွယ်ရန်)
+        let API_KEY = prompt("ThwinAI ကို စတင်ရန် Gemini API Key ကို ထည့်ပါ:");
         
         if (!API_KEY) {
-            alert("API Key မရှိဘဲ ThwinAI အလုပ်လုပ်နိုင်မည်မဟုတ်ပါ။ စာမျက်နှာကို Refresh ပြန်လုပ်ပြီး Key ထည့်ပါ။");
+            alert("API Key မရှိလျှင် အသုံးပြု၍ မရနိုင်ပါ။ Refresh ပြန်လုပ်ပြီး Key ထည့်ပါ။");
         }
 
         async function send() {
@@ -44,12 +46,13 @@
 
             if (!message || !API_KEY) return;
 
-            // User Message
+            // User message ပြသခြင်း
             chatBox.innerHTML += `<div class="msg user"><b>You:</b> ${message}</div>`;
             input.value = '';
             chatBox.scrollTop = chatBox.scrollHeight;
 
-            const API_URL = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${API_KEY}`;
+            // မှန်ကန်သော Endpoint URL (v1 version နှင့် gemini-1.5-flash)
+            const API_URL = `https://generativelanguage.googleapis.com/v1/models/gemini-1.5-flash:generateContent?key=${API_KEY}`;
 
             try {
                 const response = await fetch(API_URL, {
@@ -58,14 +61,16 @@
                     body: JSON.stringify({
                         contents: [{
                             parts: [{
-                                text: `System Instruction: You are ThwinAI, an Adaptive Intelligence System based on TTOE (Thwin Theory of Everything). Use TTOE principles (Energy, Evolution, Pattern, Interaction, Information, Consciousness) to respond. User Query: ${message}`
+                                text: `System: You are ThwinAI, an Adaptive Intelligence System based on TTOE (Thwin Theory of Everything). 
+                                Core Principles: Energy, Evolution, Pattern, Interaction, Information, Consciousness. 
+                                Respond to: ${message}`
                             }]
                         }]
                     })
                 });
 
                 const data = await response.json();
-                
+
                 if (data.error) {
                     throw new Error(data.error.message);
                 }
@@ -74,11 +79,12 @@
                 chatBox.innerHTML += `<div class="msg ai"><b>ThwinAI:</b> ${aiResponse}</div>`;
 
             } catch (error) {
-                chatBox.innerHTML += `<div class="msg ai" style="color: #f85149;"><b>Error:</b> ${error.message}. (Key မှားယွင်းနေခြင်း သို့မဟုတ် Internet မရှိခြင်း ဖြစ်နိုင်ပါသည်။)</div>`;
+                chatBox.innerHTML += `<div class="msg ai" style="color: #f85149;"><b>Error:</b> ${error.message}</div>`;
             }
             chatBox.scrollTop = chatBox.scrollHeight;
         }
 
+        // Enter key Support
         document.getElementById('userInput').addEventListener('keypress', (e) => {
             if (e.key === 'Enter') send();
         });
