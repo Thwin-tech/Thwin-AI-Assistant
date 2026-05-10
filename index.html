@@ -5,23 +5,24 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>ThwinAI - TTOE System</title>
     <style>
-        body { margin: 0; background: #0d1117; color: white; font-family: 'Segoe UI', Tahoma, sans-serif; display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100vh; }
-        .chat { width: 95%; max-width: 700px; height: 85vh; background: #161b22; border-radius: 15px; display: flex; flex-direction: column; overflow: hidden; box-shadow: 0 0 25px rgba(0,0,0,.5); border: 1px solid #30363d; }
-        .header { background: #238636; padding: 15px; text-align: center; font-size: 22px; font-weight: bold; letter-spacing: 2px; }
+        body { margin: 0; background: #0d1117; color: white; font-family: 'Segoe UI', sans-serif; display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100vh; }
+        .chat { width: 95%; max-width: 600px; height: 85vh; background: #161b22; border-radius: 15px; display: flex; flex-direction: column; overflow: hidden; border: 1px solid #30363d; box-shadow: 0 0 20px rgba(0,0,0,0.5); }
+        .header { background: #238636; padding: 15px; text-align: center; font-size: 20px; font-weight: bold; letter-spacing: 2px; }
         .messages { flex: 1; overflow-y: auto; padding: 15px; display: flex; flex-direction: column; }
-        .msg { margin: 10px 0; padding: 12px; border-radius: 12px; max-width: 80%; line-height: 1.5; word-wrap: break-word; }
+        .msg { margin: 10px 0; padding: 12px; border-radius: 10px; max-width: 80%; line-height: 1.5; word-wrap: break-word; }
         .user { background: #1f6feb; align-self: flex-end; border-bottom-right-radius: 2px; }
         .ai { background: #30363d; align-self: flex-start; border-bottom-left-radius: 2px; border-left: 4px solid #238636; }
         .inputBox { display: flex; padding: 15px; background: #0d1117; border-top: 1px solid #30363d; }
-        input { flex: 1; padding: 12px; border: none; border-radius: 10px; background: #21262d; color: white; outline: none; }
-        button { margin-left: 10px; padding: 12px 25px; border: none; border-radius: 10px; background: #238636; color: white; cursor: pointer; font-weight: bold; }
+        input { flex: 1; padding: 12px; border: none; border-radius: 8px; background: #21262d; color: white; outline: none; }
+        button { margin-left: 10px; padding: 12px 20px; border: none; border-radius: 8px; background: #238636; color: white; cursor: pointer; font-weight: bold; }
+        button:hover { background: #2ea043; }
     </style>
 </head>
 <body>
 
 <div class="chat">
     <div class="header">THWIN AI</div>
-    <div class="messages" id="messages"></div>
+    <div id="messages" class="messages"></div>
     <div class="inputBox">
         <input id="input" placeholder="TTOE နည်းစနစ်ဖြင့် မေးမြန်းရန်..." autocomplete="off">
         <button onclick="send()">Send</button>
@@ -29,11 +30,11 @@
 </div>
 
 <script>
-    // API Key ကို စဖွင့်ချင်း Prompt ဖြင့် တောင်းယူခြင်း
+    // API Key ကို Prompt ဖြင့် တောင်းယူခြင်း
     let API_KEY = prompt("ThwinAI ကို စတင်ရန် Gemini API Key ကို ထည့်ပါ:");
 
     if (!API_KEY) {
-        alert("API Key လိုအပ်ပါသည်။ Page ကို Refresh လုပ်ပြီး Key ပြန်ထည့်ပါ။");
+        alert("API Key မရှိလျှင် အသုံးပြု၍ မရနိုင်ပါ။ Page ကို Refresh လုပ်ပြီး Key ပြန်ထည့်ပါ။");
     }
 
     async function send() {
@@ -48,7 +49,7 @@
         input.value = "";
         messages.scrollTop = messages.scrollHeight;
 
-        // နောက်ဆုံးပြခဲ့သည့် Error အရ v1beta သို့ ပြန်လည်ပြောင်းလဲထားသည်
+        // Endpoint ကို v1 မှ v1beta သို့ ပြောင်းလဲထားပါသည် (Model ရှာမတွေ့သည့် Error အတွက်)
         const API_URL = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${API_KEY}`;
 
         try {
@@ -58,7 +59,7 @@
                 body: JSON.stringify({
                     contents: [{
                         parts: [{
-                            text: `System Instruction: You are ThwinAI, an advanced AI based on TTOE (Thwin Theory of Everything). Use TTOE logic to respond: ${text}`
+                            text: `System Instruction: You are ThwinAI, based on TTOE (Thwin Theory of Everything) logic. Respond to this query: ${text}`
                         }]
                     }]
                 })
